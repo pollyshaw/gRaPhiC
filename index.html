@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+
+<nav class="nav js-nav">
+    <header class="nav-header">
+        <h1 class="nav-title">gRaPhiCview</h1>
+    </header>
+
+    <div>
+        <label for="txtProtobufFile">Protobuf file</label><input type="text" id="txtProtobufFile" data-bind="value: grpcFile"/>
+    </div>
+    <div>
+        <label for="txtProtobufRoot">Protobuf root</label><input type="text" id="txtProtobufRoot" data-bind="value: grpcRoot"/>
+    </div>
+    <div><input id type="button" value="Load" data-bind="click:load"/></div>
+    
+    <div id="servicesTable" data-bind="foreach: services"> 
+        <h2 data-bind="text: name">
+            
+        </h2>
+        <div data-bind="foreach: methods">
+            <h3 data-bind="text: displayName()"></h3>
+        </div>
+    </div>
+</nav>
+<script>
+const grpc = require('grpc')
+const ko = require('knockout')
+
+let getServiceDefinitions = function(grpcFile, grpcRoot) {
+    localStorage.setItem("grpcFile", grpcFile)
+    localStorage.setItem("grpcRoot", grpcRoot)
+    const accountService = grpc.load(
+        {
+            "file": grpcFile,
+            "root": grpcRoot
+        }
+    )
+    
+    let buildTypeModel = function(messageType)
+    {
+        let result = {name: messageType.name}
+        return result;
+    }
+    console.log(JSON.stringify(accountService))
+
+    var array = [];
+
+    for (i in accountService.ServiceDefinitions) {
+        var item = {name: i, methods: ko.observableArray()}
+        for (method in accountService.ServiceDefinitions[i].service) {
+            let methodDefinition = accountService.ServiceDefinitions[i].service[method];
+            item.methods.push({name: method,
+                requestStream: methodDefinition.requestStream,
+                responseStream: methodDefinition.responseStream,
+                requestType: buildTypeModel(methodDefinition.requestType),
+                responseType: buildTypeModel(methodDefinition.responseType),
+                displayName: function() { return `${this.name}(${this.requestType.name}): ${this.responseType.name}`}
+            })
+        }
+        array.push(item)
+    }
+
+    return array;
+}
+
+var myViewModel = {
+    grpcFile: ko.observable(localStorage.getItem("grpcFile")),
+    grpcRoot: ko.observable(localStorage.getItem("grpcRoot")),
+    load: function() {
+        this.services.removeAll();
+        let newServiceDefinitions = getServiceDefinitions(this.grpcFile(), this.grpcRoot())
+        for(var i = 0; i < newServiceDefinitions.length; i++) {
+            this.services.push(newServiceDefinitions[i])
+        }
+    },
+    services: ko.observableArray()
+}
+
+
+ko.applyBindings(myViewModel)
+</script>
+</body>
+</html>
