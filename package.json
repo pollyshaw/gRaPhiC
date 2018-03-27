@@ -35,10 +35,12 @@
     }
   },
   "devDependencies": {
+    "chai": "^4.1.2",
     "devtron": "^1.4.0",
     "electron": "^1.8.4",
     "electron-rebuild": "^1.7.3",
     "grpc": "^1.10.0",
+    "mocha": "^5.0.5",
     "yarn": "^1.5.1"
   }
 }

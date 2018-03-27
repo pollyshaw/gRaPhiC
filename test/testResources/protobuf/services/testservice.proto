@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package test;
+
+service TestService {
+
+    rpc NoOp(EmptyMessage) returns (EmptyMessage){}
+}
+
+service SecondTestService {
+    rpc NoOp(EmptyMessage) returns (EmptyMessage){}    
+}
+
+message EmptyMessage {}
