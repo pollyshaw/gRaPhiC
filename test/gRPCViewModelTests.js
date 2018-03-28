@@ -27,4 +27,17 @@ describe('grpcViewModel', function() {
     assert(result().filter(o => o.name === "test.NonExistentService").length === 0)
   });
 
+  it('should extract methods with the grpc services', function () {
+    let result = grpcViewModel.getAllServices(grpcServices);
+    var testServiceViewModel = result().filter(o => o.name === "test.TestService")[0]
+    assert(testServiceViewModel.methods().length === 1)
+    assert(testServiceViewModel.methods()[0].name === "NoOp")
+  });
+
+  it('should extract request messages with the grpc services', function () {
+    let result = grpcViewModel.getAllServices(grpcServices);
+    var testMethodViewModel = result().filter(o => o.name === "test.TestService")[0][0]
+    assert(testMethodViewModel.requestMessage.type.name === "EmptyMessage")
+  });
+
 });

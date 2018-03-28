@@ -20,12 +20,23 @@ let buildTypeModel = function(messageType) {
     return result;
 }
 
+let getServiceMethods = function(grpcService) {
+    let result = ko.observableArray()
+    for (method in grpcService.service) {
+        result.push({name: grpcService.service[method].originalName})
+    }
+    return result;
+}
+
 let getAllServices = function(loadedGrpc) {
-    result = ko.observableArray()
+    let result = ko.observableArray()
     for(namespace in loadedGrpc) {
         for (service in loadedGrpc[namespace]){
             if(loadedGrpc[namespace][service].name === "ServiceClient") {
-                result.push({name: `${namespace}.${service}`})
+                result.push({
+                    name: `${namespace}.${service}`,
+                    methods: getServiceMethods(loadedGrpc[namespace][service])
+                })
             }
         }
     }
