@@ -4,7 +4,7 @@ package test;
 
 service TestService {
 
-    rpc NoOp(EmptyMessage) returns (EmptyMessage){}
+    rpc NoOp(EmptyMessage) returns (Person){}
 }
 
 service SecondTestService {
@@ -12,3 +12,13 @@ service SecondTestService {
 }
 
 message EmptyMessage {}
+message Address {
+    string address_line_1 = 1;
+    string postcode = 2;
+} 
+
+message Person {
+    string first_name = 1;
+    uint32 year_of_birth = 2;
+    Address address = 3;
+}

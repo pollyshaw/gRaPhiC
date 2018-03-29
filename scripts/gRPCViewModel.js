@@ -6,7 +6,7 @@ let buildTypeModel = function(messageType) {
     result.type = messageType
     result.children = ko.observableArray()
     if (messageType.children) {
-        for(child in messageType.children) {
+        for(let child in messageType.children) {
             let field = messageType.children[child] 
             let fieldModel = {
                 name: field.name,
@@ -20,18 +20,40 @@ let buildTypeModel = function(messageType) {
     return result;
 }
 
+let getTypeModel = function(type) {
+    let properties = ko.observableArray()
+    if (type.children) {
+        for (let child in type.children) {
+            let childField = 
+            properties.push({
+                name: type.children[child].name,
+                type: getTypeModel(type.children[child].resolvedType? type.children[child].resolvedType: type.children[child].type)
+            })
+        }
+    }
+    return {
+        name: type.name,
+        properties: properties,
+        isScalar: !type.children    
+    }
+}
+
 let getServiceMethods = function(grpcService) {
     let result = ko.observableArray()
-    for (method in grpcService.service) {
-        result.push({name: grpcService.service[method].originalName})
+    for (let method in grpcService.service) {
+        result.push({
+            name: grpcService.service[method].originalName,
+            requestType: getTypeModel(grpcService.service[method].requestType),
+            responseType: getTypeModel(grpcService.service[method].responseType)
+        })
     }
     return result;
 }
 
 let getAllServices = function(loadedGrpc) {
     let result = ko.observableArray()
-    for(namespace in loadedGrpc) {
-        for (service in loadedGrpc[namespace]){
+    for(let namespace in loadedGrpc) {
+        for (let service in loadedGrpc[namespace]){
             if(loadedGrpc[namespace][service].name === "ServiceClient") {
                 result.push({
                     name: `${namespace}.${service}`,
