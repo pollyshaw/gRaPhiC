@@ -1,27 +1,7 @@
 let ko = require("knockout")
 
-let buildTypeModel = function(messageType) {
-    if (!messageType) return null
-    let result = {name: messageType.name}
-    result.type = messageType
-    result.children = ko.observableArray()
-    if (messageType.children) {
-        for(let child in messageType.children) {
-            let field = messageType.children[child] 
-            let fieldModel = {
-                name: field.name,
-                isScalar: !field.resolvedType,
-                typeName: field.type? field.type.name : null,
-                typeStructure: buildTypeModel(field.resolvedType)
-            }
-            result.children.push(fieldModel)
-        }
-    }
-    return result;
-}
-
 let getTypeModel = function(type) {
-    let properties = ko.observableArray()
+    let properties = []
     if (type.children) {
         for (let child in type.children) {
             let childField = 
@@ -34,12 +14,13 @@ let getTypeModel = function(type) {
     return {
         name: type.name,
         properties: properties,
-        isScalar: !type.children    
+        isScalar: !type.children,
+        value: ko.observable()
     }
 }
 
 let getServiceMethods = function(grpcService) {
-    let result = ko.observableArray()
+    let result = []
     for (let method in grpcService.service) {
         result.push({
             name: grpcService.service[method].originalName,
@@ -47,11 +28,11 @@ let getServiceMethods = function(grpcService) {
             responseType: getTypeModel(grpcService.service[method].responseType)
         })
     }
-    return result;
+    return result
 }
 
 let getAllServices = function(loadedGrpc) {
-    let result = ko.observableArray()
+    let result = []
     for(let namespace in loadedGrpc) {
         for (let service in loadedGrpc[namespace]){
             if(loadedGrpc[namespace][service].name === "ServiceClient") {
@@ -67,6 +48,5 @@ let getAllServices = function(loadedGrpc) {
 
 
 module.exports = {
-    buildTypeModel: buildTypeModel,
     getAllServices: getAllServices
 }

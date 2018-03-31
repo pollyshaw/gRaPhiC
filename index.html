@@ -4,7 +4,18 @@
     <meta charset="utf-8">
 </head>
 <body>
-
+    <script type="text/html" id="request-template">
+        <div>
+            <span data-bind="if: isScalar">
+            <input type="text" data-bind="value:value"/>
+            </span>
+            <div style="padding-left:5px;border-left:5px solid gray" data-bind="foreach: properties">
+                <span data-bind="text: name + '(' + type.name + ')'"></span> 
+                <div data-bind="template: {name:'request-template', data: type}">
+                </div>
+            </div>
+        </div>
+    </script>
 <nav class="nav js-nav">
     <header class="nav-header">
         <h1 class="nav-title">gRaPhiCview</h1>
@@ -23,26 +34,15 @@
             
         </h2>
         <div data-bind="foreach: methods">
-            <h3 data-bind="text: displayName()"></h3>
+            <h3 data-bind="text: name + '(' + requestType.name + '): ' + responseType.name"></h3>
             <div data-bind="template: {name:'request-template', data: requestType}">
             </div>
-            <script type="text/html" id="request-template">
-                <div style="padding-left:5px;border-left:5px solid gray">
-                    
-                    <span data-bind="text: name"></span>
-                        <div data-bind="foreach: children">
-                            <!--<div data-bind="if: typeStructure">
-                                <div data-bind="template: {name:'request-template', data: typeStructure}">
-                                </div>
-                            </div>-->                        
-                        </div>
-                    </div>
-                </div>
-            </script>
+            <input type="button" value="Encode Request"/>&nbsp;
             <input type="button" value="Invoke"/>
         </div>
     </div>
 </nav>
+<pre data-bind="text: ko.toJSON($data, null, 2)"></pre>
 <script>
 const grpc = require('grpc')
 const ko = require('knockout')
@@ -51,36 +51,19 @@ const gRPCViewModel = require('./scripts/gRPCViewModel')
 let getServiceDefinitions = function(grpcFile, grpcRoot) {
     localStorage.setItem("grpcFile", grpcFile)
     localStorage.setItem("grpcRoot", grpcRoot)
-    const accountService = grpc.load(
+    const services = grpc.load(
         {
             "file": grpcFile,
             "root": grpcRoot
         }
     )
     
-    console.log(JSON.stringify(accountService))
+    console.log(JSON.stringify(services))
 
-    var array = [];
-
-    for (i in accountService.ServiceDefinitions) {
-        var item = {name: i, methods: ko.observableArray()}
-        for (method in accountService.ServiceDefinitions[i].service) {
-            let methodDefinition = accountService.ServiceDefinitions[i].service[method];
-            item.methods.push({name: method,
-                requestStream: methodDefinition.requestStream,
-                responseStream: methodDefinition.responseStream,
-                requestType: gRPCViewModel.buildTypeModel(methodDefinition.requestType),
-                responseType: gRPCViewModel.buildTypeModel(methodDefinition.responseType),
-                displayName: function() { return `${this.name}(${this.requestType.name}): ${this.responseType.name}`}
-            })
-        }
-        array.push(item)
-    }
-
-    return array;
+    return gRPCViewModel.getAllServices(services)
 }
 
-var myViewModel = {
+let myViewModel = {
     grpcFile: ko.observable(localStorage.getItem("grpcFile")),
     grpcRoot: ko.observable(localStorage.getItem("grpcRoot")),
     load: function() {
