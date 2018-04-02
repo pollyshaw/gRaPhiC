@@ -40,11 +40,23 @@ describe('grpcViewModel', function() {
     let testMethodViewModel = testServiceViewModel.methods[0]
 
     it('should extract request messages with the grpc services', function () {
-      assert(testMethodViewModel.requestType.name === "IdoMessage")
+      assert(testMethodViewModel.requestType.name === "IdMessage")
     })
 
     it('should extract response messages with the grpc services', function () {
       assert(testMethodViewModel.responseType.name === "Person")
+    })
+
+    it('should have a working getBytes method', function() {
+      let bytes = testMethodViewModel.requestType.getBytes()
+      assert(bytes)
+    })
+
+    it('should provide appropriate types for integers', function() {
+      testMethodViewModel.requestType.properties.filter(o => o.name === "id")[0].type.value("8")
+      let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue().id
+      assert(valueFromEffectiveValue === 8)
+      assert(valueFromEffectiveValue !== "8")      
     })
 
     describe("when I get a return type", function() {
@@ -64,7 +76,7 @@ describe('grpcViewModel', function() {
 
         it('should have type string', function() {
           assert(firstName.type.name === 'string')
-        })
+        })        
 
       })
 

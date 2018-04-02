@@ -37,7 +37,8 @@
             <h3 data-bind="text: name + '(' + requestType.name + '): ' + responseType.name"></h3>
             <div data-bind="template: {name:'request-template', data: requestType}">
             </div>
-            <input type="button" value="Encode Request"/>&nbsp;
+            <div data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></div>
+            <div data-bind="text: requestType.hexBytes"></div>
             <input type="button" value="Invoke"/>
         </div>
     </div>

@@ -11,12 +11,44 @@ let getTypeModel = function(type) {
             })
         }
     }
-    return {
+    let result = {
         name: type.name,
         properties: properties,
         isScalar: !type.children,
-        value: ko.observable()
+        value: ko.observable()        
     }
+
+    result.effectiveValue = ko.computed(function() {
+        if (result.isScalar) {
+            let valueAsString = result.value();
+            if (result.name === 'uint32') {
+                if (valueAsString){
+                    return parseInt(valueAsString);
+                }
+                return 0
+            }
+            return valueAsString
+        } else {
+            let acc = {};
+            for (let i = 0; i < result.properties.length; i++) {
+                acc[result.properties[i].name] = result.properties[i].type.effectiveValue()
+            }
+            return acc
+        }
+    }, result)
+
+    result.getBytes = function() {
+        if (result.isScalar) return null
+        let json = JSON.stringify(result.effectiveValue())
+        return type.clazz.decodeJSON(json).encode()    
+    }
+
+    result.hexBytes = ko.computed(function() {
+        if (result.isScalar) return null
+        return result.getBytes().toHex()
+    }, result)
+
+    return result;
 }
 
 let getServiceMethods = function(grpcService) {
