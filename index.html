@@ -27,6 +27,9 @@
     <div>
         <label for="txtProtobufRoot">Protobuf root</label><input type="text" id="txtProtobufRoot" data-bind="value: grpcRoot"/>
     </div>
+    <div>
+        <label for="txtServiceRootUrl">Service Root URL</label><input type="text" id="txtServiceRootUrl" data-bind="value: serviceRootUrl"/>
+    </div>        
     <div><input id type="button" value="Load" data-bind="click:load"/></div>
     
     <div id="servicesTable" data-bind="foreach: services"> 
@@ -35,9 +38,12 @@
         </h2>
         <div data-bind="foreach: methods">
             <h3 data-bind="text: name + '(' + requestType.name + '): ' + responseType.name"></h3>
+            <h4>Request value</h4>
             <div data-bind="template: {name:'request-template', data: requestType}">
             </div>
+            <h5>JSON representation</h5>
             <div data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></div>
+            <h5>Protobuf representation (hex)</h5>
             <div data-bind="text: requestType.hexBytes"></div>
             <input type="button" value="Invoke"/>
         </div>
@@ -67,6 +73,7 @@ let getServiceDefinitions = function(grpcFile, grpcRoot) {
 let myViewModel = {
     grpcFile: ko.observable(localStorage.getItem("grpcFile")),
     grpcRoot: ko.observable(localStorage.getItem("grpcRoot")),
+    serviceRootUrl: ko.observable(localStorage.getItem("serviceRootUrl")),
     load: function() {
         this.services.removeAll();
         let newServiceDefinitions = getServiceDefinitions(this.grpcFile(), this.grpcRoot())
@@ -77,6 +84,9 @@ let myViewModel = {
     services: ko.observableArray()
 }
 
+myViewModel.serviceRootUrl.subscribe(function(newValue) {
+    localStorage.setItem("serviceRootUrl", newValue)
+})
 
 ko.applyBindings(myViewModel)
 </script>
