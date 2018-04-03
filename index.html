@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
+  <meta charset="utf-8">
 </head>
+
 <body>
-    <script type="text/html" id="request-template">
+  <script type="text/html" id="request-template">
         <div>
             <span data-bind="if: isScalar">
             <input type="text" data-bind="value:value"/>
@@ -16,79 +18,90 @@
             </div>
         </div>
     </script>
-<nav class="nav js-nav">
+  <nav class="nav js-nav">
     <header class="nav-header">
-        <h1 class="nav-title">gRaPhiCview</h1>
+      <h1 class="nav-title">gRaPhiCview</h1>
     </header>
 
     <div>
-        <label for="txtProtobufFile">Protobuf file</label><input type="text" id="txtProtobufFile" data-bind="value: grpcFile"/>
+      <label for="txtProtobufFile">Protobuf file</label>
+      <input type="text" id="txtProtobufFile" data-bind="value: grpcFile" />
     </div>
     <div>
-        <label for="txtProtobufRoot">Protobuf root</label><input type="text" id="txtProtobufRoot" data-bind="value: grpcRoot"/>
+      <label for="txtProtobufRoot">Protobuf root</label>
+      <input type="text" id="txtProtobufRoot" data-bind="value: grpcRoot" />
     </div>
     <div>
-        <label for="txtServiceRootUrl">Service Root URL</label><input type="text" id="txtServiceRootUrl" data-bind="value: serviceRootUrl"/>
-    </div>        
-    <div><input id type="button" value="Load" data-bind="click:load"/></div>
-    
-    <div id="servicesTable" data-bind="foreach: services"> 
-        <h2 data-bind="text: name">
-            
-        </h2>
-        <div data-bind="foreach: methods">
-            <h3 data-bind="text: name + '(' + requestType.name + '): ' + responseType.name"></h3>
-            <h4>Request value</h4>
-            <div data-bind="template: {name:'request-template', data: requestType}">
-            </div>
-            <h5>JSON representation</h5>
-            <div data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></div>
-            <h5>Protobuf representation (hex)</h5>
-            <div data-bind="text: requestType.hexBytes"></div>
-            <input type="button" value="Invoke"/>
+      <label for="txtServiceRootUrl">Service Root URL</label>
+      <input type="text" id="txtServiceRootUrl" data-bind="value: serviceRootUrl" />
+    </div>
+    <div>
+      <input id type="button" value="Load" data-bind="click:load" />
+    </div>
+
+    <div id="servicesTable" data-bind="foreach: services">
+      <h2 data-bind="text: name">
+
+      </h2>
+      <div data-bind="foreach: methods">
+        <h3 data-bind="text: name + '(' + requestType.name + '): ' + responseType.name"></h3>
+        <h4>Request value</h4>
+        <div data-bind="template: {name:'request-template', data: requestType}">
         </div>
+        <h5>JSON representation</h5>
+        <div data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></div>
+        <h5>Protobuf representation (hex)</h5>
+        <div data-bind="text: requestType.hexBytes"></div>
+        <input type="button" value="Invoke" data-bind="click: invoke($root.serviceRootUrl(), 
+        grpc.credentials.createInsecure(), 
+        {},
+        function (...params) { 
+          console.log(`Called service with result ${JSON.stringify(params)}`)
+        })" />
+      </div>
     </div>
-</nav>
-<pre data-bind="text: ko.toJSON($data, null, 2)"></pre>
-<script>
-const grpc = require('grpc')
-const ko = require('knockout')
-const gRPCViewModel = require('./scripts/gRPCViewModel')
+  </nav>
+  <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>
+  <script>
+    const grpc = require('grpc')
+    const ko = require('knockout')
+    const gRPCViewModel = require('./scripts/gRPCViewModel')
 
-let getServiceDefinitions = function(grpcFile, grpcRoot) {
-    localStorage.setItem("grpcFile", grpcFile)
-    localStorage.setItem("grpcRoot", grpcRoot)
-    const services = grpc.load(
+    let getServiceDefinitions = function (grpcFile, grpcRoot) {
+      localStorage.setItem("grpcFile", grpcFile)
+      localStorage.setItem("grpcRoot", grpcRoot)
+      const services = grpc.load(
         {
-            "file": grpcFile,
-            "root": grpcRoot
+          "file": grpcFile,
+          "root": grpcRoot
         }
-    )
-    
-    console.log(JSON.stringify(services))
+      )
 
-    return gRPCViewModel.getAllServices(services)
-}
+      console.log(JSON.stringify(services))
 
-let myViewModel = {
-    grpcFile: ko.observable(localStorage.getItem("grpcFile")),
-    grpcRoot: ko.observable(localStorage.getItem("grpcRoot")),
-    serviceRootUrl: ko.observable(localStorage.getItem("serviceRootUrl")),
-    load: function() {
+      return gRPCViewModel.getAllServices(services)
+    }
+
+    let myViewModel = {
+      grpcFile: ko.observable(localStorage.getItem("grpcFile")),
+      grpcRoot: ko.observable(localStorage.getItem("grpcRoot")),
+      serviceRootUrl: ko.observable(localStorage.getItem("serviceRootUrl")),
+      load: function () {
         this.services.removeAll();
         let newServiceDefinitions = getServiceDefinitions(this.grpcFile(), this.grpcRoot())
-        for(var i = 0; i < newServiceDefinitions.length; i++) {
-            this.services.push(newServiceDefinitions[i])
+        for (var i = 0; i < newServiceDefinitions.length; i++) {
+          this.services.push(newServiceDefinitions[i])
         }
-    },
-    services: ko.observableArray()
-}
+      },
+      services: ko.observableArray()
+    }
 
-myViewModel.serviceRootUrl.subscribe(function(newValue) {
-    localStorage.setItem("serviceRootUrl", newValue)
-})
+    myViewModel.serviceRootUrl.subscribe(function (newValue) {
+      localStorage.setItem("serviceRootUrl", newValue)
+    })
 
-ko.applyBindings(myViewModel)
-</script>
+    ko.applyBindings(myViewModel)
+  </script>
 </body>
+
 </html>
