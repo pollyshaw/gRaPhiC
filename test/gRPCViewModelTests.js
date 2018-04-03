@@ -62,8 +62,19 @@ describe('grpcViewModel', function () {
           {},
           function (...params) { 
             console.log(`Called service with result ${JSON.stringify(params)}`) 
+            console.log("Value of first name is ", testMethodViewModel
+            .responseType
+            .properties
+            .filter(p => p.name= 'first_name')[0]
+            .type.value())
+            assert(
+              testMethodViewModel
+              .responseType
+              .properties
+              .filter(p => p.name= 'first_name')[0]
+              .type.value() === 'Brilliana')
             testService.stopServer()
-          });
+          })
       })
     })
 

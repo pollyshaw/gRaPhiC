@@ -48,6 +48,24 @@ let getTypeModel = function (type) {
     return result.getBytes().toHex()
   }, result)
 
+  result.readFromObject = function(obj) {
+    let getPropertyOfObj = function(name){
+      if (!obj) {
+        return null
+      } else {
+        return obj[name]
+      }
+    }
+    for (let i = 0; i < properties.length; i++){
+      let currentProperty = properties[i]
+      if (currentProperty.type.isScalar) {
+        currentProperty.type.value(getPropertyOfObj(currentProperty.name))
+      } else {
+        currentProperty.type.readFromObject(getPropertyOfObj(currentProperty.name))
+      }
+    }
+  }
+
   return result;
 }
 
@@ -56,10 +74,11 @@ let getServiceMethods = function (grpcService) {
   for (let method in grpcService.service) {
     let name = grpcService.service[method].originalName
     let requestType = getTypeModel(grpcService.service[method].requestType)
+    let responseType = getTypeModel(grpcService.service[method].responseType)
     result.push({
       name: name,
       requestType: requestType,
-      responseType: getTypeModel(grpcService.service[method].responseType),
+      responseType: responseType,
       invoke: function (rootUrl, credentials, options, callback) {
         let serviceClient = new grpcService(rootUrl, credentials, options)
         let serializer = function (hexString) { return Buffer.from(hexString, 'hex') }
@@ -68,7 +87,12 @@ let getServiceMethods = function (grpcService) {
           requestType.effectiveValue(), 
           null, 
           null,
-          callback)
+          function(err, result) {
+            if (!err) {
+              responseType.readFromObject(result)
+            }
+            callback(err, result)
+          })
       }
     })
   }

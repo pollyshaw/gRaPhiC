@@ -52,12 +52,18 @@
         <div data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></div>
         <h5>Protobuf representation (hex)</h5>
         <div data-bind="text: requestType.hexBytes"></div>
-        <input type="button" value="Invoke" data-bind="click: invoke($root.serviceRootUrl(), 
+        <input type="button" value="Invoke" data-bind="click: function() { invoke($root.serviceRootUrl(), 
         grpc.credentials.createInsecure(), 
         {},
         function (...params) { 
-          console.log(`Called service with result ${JSON.stringify(params)}`)
-        })" />
+          console.log(`Called service with result ${JSON.stringify(params)}`)          
+        })}" />
+        <h4>Response value</h4>
+        <h5>JSON representation</h5>
+        <div data-bind="text: ko.toJSON($data.responseType.effectiveValue(), null, 2)"></div>
+        <h5>Protobuf representation (hex)</h5>
+        <div data-bind="text: responseType.hexBytes"></div>
+        
       </div>
     </div>
   </nav>
