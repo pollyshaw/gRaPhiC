@@ -13,6 +13,9 @@
             </span>
             <div style="padding-left:5px;border-left:5px solid gray" data-bind="foreach: properties">
                 <span data-bind="text: name + '(' + type.name + ')'"></span> 
+                <div data-bind="if:oneOf">
+                  <input type="radio" data-bind="attr: {name: oneOf}, value: name" />
+                </div>
                 <div data-bind="template: {name:'request-template', data: type}">
                 </div>
             </div>
