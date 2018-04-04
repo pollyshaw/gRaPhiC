@@ -7,7 +7,7 @@
     "start": "electron .",
     "dev": "electron . --debug",
     "dev-non-electron": "node ./justgrpc.js",
-    "test": "mocha && standard",
+    "test": "mocha",
     "package": "npm-run-all package:*",
     "package:mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --out=out --icon=assets/app-icon/mac/app.icns --osx-sign.identity='Developer ID Application: GitHub' --extend-info=assets/mac/info.plist",
     "package:win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --out=out --icon=assets/app-icon/win/app.ico",
@@ -27,7 +27,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "knockout": "^3.5.0-beta",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "grpc": "^1.10.1"
   },
   "standard": {
     "env": {
@@ -39,7 +40,6 @@
     "devtron": "^1.4.0",
     "electron": "^1.8.4",
     "electron-rebuild": "^1.7.3",
-    "grpc": "^1.10.0",
     "mocha": "^5.0.5",
     "yarn": "^1.5.1"
   }
