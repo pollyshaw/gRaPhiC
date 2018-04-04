@@ -3,11 +3,15 @@ let ko = require("knockout")
 let getTypeModel = function (type) {
   let properties = []
   if (type.children) {
-    for (let child in type.children) {
+    let fieldChildren = type.children.filter(c => c.className === 'Message.Field') 
+    for (let child in fieldChildren) {
       let childField =
         properties.push({
-          name: type.children[child].name,
-          type: getTypeModel(type.children[child].resolvedType ? type.children[child].resolvedType : type.children[child].type)
+          name: fieldChildren[child].name,
+          type: getTypeModel(fieldChildren[child].resolvedType ?
+              fieldChildren[child].resolvedType :
+              fieldChildren[child].type),
+          oneOf: fieldChildren[child].oneof? fieldChildren[child].oneof.name: null
         })
     }
   }

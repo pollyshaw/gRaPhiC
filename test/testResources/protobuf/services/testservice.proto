@@ -8,14 +8,22 @@ service TestService {
 }
 
 service SecondTestService {
-    rpc NoOp(EmptyMessage) returns (EmptyMessage){}    
+    rpc NoOp(EmptyMessage) returns (PossiblyFailingMessage){}
 }
 
 message EmptyMessage {}
+
+message PossiblyFailingMessage {
+    oneof result {
+        EmptyMessage success = 1;
+        EmptyMessage failure = 2;
+    }
+    EmptyMessage but_always_there = 3;
+}
 message Address {
     string address_line_1 = 1;
     string postcode = 2;
-} 
+}
 
 message Person {
     string first_name = 1;

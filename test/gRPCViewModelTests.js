@@ -30,7 +30,7 @@ describe('grpcViewModel', function () {
 
   it('should extract methods with the grpc services', function () {
     let result = grpcViewModel.getAllServices(grpcServices)
-    var testServiceViewModel = result.filter(o => o.name === "test.TestService")[0]
+    let testServiceViewModel = result.filter(o => o.name === "test.TestService")[0]
     assert(testServiceViewModel.methods.length === 1)
     assert(testServiceViewModel.methods[0].name === "NoOp")
   })
@@ -38,6 +38,7 @@ describe('grpcViewModel', function () {
   describe("When I get the service", function () {
     let result = grpcViewModel.getAllServices(grpcServices)
     let testServiceViewModel = result.filter(o => o.name === "test.TestService")[0]
+    let secondTestServiceViewModel = result.filter(o => o.name === "test.SecondTestService")[0]
     let testMethodViewModel = testServiceViewModel.methods[0]
 
     it('should extract request messages with the grpc services', function () {
@@ -60,7 +61,7 @@ describe('grpcViewModel', function () {
         let client = testMethodViewModel.invoke(`localhost:${testService.port}`, 
           grpc.credentials.createInsecure(), 
           {},
-          function (...params) { 
+          function (...params) {
             console.log(`Called service with result ${JSON.stringify(params)}`) 
             console.log("Value of first name is ", testMethodViewModel
             .responseType
@@ -136,6 +137,21 @@ describe('grpcViewModel', function () {
 
       })
 
+    })
+
+    describe("when I get a return type with a OneOf", function() {
+      let possiblyFailingReturnType = secondTestServiceViewModel.methods[0].responseType
+
+      it('should have 3 children', function () {
+        assert(possiblyFailingReturnType.properties.length === 3)
+      })
+
+      it('should have the first two with a OneOf value', function() {
+        assert.equal(possiblyFailingReturnType.properties[0].oneOf, 'result')
+        assert.equal(possiblyFailingReturnType.properties[1].oneOf,'result')
+        assert(!possiblyFailingReturnType.properties[2].oneOf)
+
+      })
     })
 
   })

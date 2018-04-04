@@ -20,7 +20,7 @@ function getServer() {
       })
     }
   })
-  return server;
+  return server
 }
 
 function startServer() {
