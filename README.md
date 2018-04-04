@@ -9,7 +9,7 @@
 ### Building
 ```
 npm install
-npm test - should have all tests passing
+npm test # should have all tests passing
 ```
 
 Set an environment variable called PYTHON to the location of the Python 2.7 executable
