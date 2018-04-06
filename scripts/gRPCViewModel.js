@@ -52,11 +52,14 @@ let getTypeModel = function (type) {
   result.effectiveValue = ko.computed(function () {
     if (result.isScalar) {
       let valueAsString = result.value();
-      if (result.name === 'uint32') {
+      if (['uint32', 'int32', 'sint32', 'fixed32', 'sfixed32'].includes(result.name)) {
         if (valueAsString) {
           return parseInt(valueAsString) || 0;
         }
         return 0
+      }
+      else if(['uint64', 'int64', 'sint64', 'fixed64', 'sfixed64'].includes(result.name)) {
+        return valueAsString || '0'
       }
       return valueAsString
     } else {

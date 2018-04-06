@@ -12,11 +12,11 @@ function getServer() {
   let server = new grpc.Server();
   server.addService(grpcServices.test.TestService.service, {
     noOp: function (call, callback) {
-      console.log(`called NoOp with Id ${call.request.id}`)
+      console.log(`called NoOp with Id ${JSON.stringify(call.request)}`)
       callback(null, {
         first_name: "Brilliana",
         year_of_birth: 2005,
-        address: {address_line_1:`${call.request.id} the Street`,postcode: "AB1 1AA"}
+        address: {address_line_1:`${call.request.id1} the Street`,postcode: "AB1 1AA"}
       })
     }
   })

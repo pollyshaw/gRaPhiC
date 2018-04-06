@@ -39,5 +39,14 @@ message Person {
 }
 
 message IdMessage {
-    uint32 id = 1;
+    uint32 id1 = 1;
+    uint64 id2 = 2;
+    int32 id3 = 3;
+    int64 id4 = 4;
+    sint32 id5 = 5;
+    sint64 id6 = 6;
+    fixed32 id7 = 7;
+    fixed64 id8 = 8;
+    sfixed32 id9 = 9;
+    sfixed64 id10 = 10;
 }

@@ -12,8 +12,9 @@ describe('grpcViewModel', function () {
   const grpcServices = grpc.load(
     {
       "file": 'services/testservice.proto',
-      "root": `${__dirname}/testResources/protobuf`
-    }
+      "root": `${__dirname}/testResources/protobuf`,
+    },
+    "proto"
   )
 
   it('should return something when supplied with a grpc service', function () {
@@ -58,8 +59,8 @@ describe('grpcViewModel', function () {
       testService.startServer()
 
       it('should have an invoke method on each method', function () {
-        let client = testMethodViewModel.invoke(`localhost:${testService.port}`, 
-          grpc.credentials.createInsecure(), 
+        let client = testMethodViewModel.invoke(`localhost:${testService.port}`,
+          grpc.credentials.createInsecure(),
           {},
           function (...params) {
             console.log(`Called service with result ${JSON.stringify(params)}`) 
@@ -79,17 +80,34 @@ describe('grpcViewModel', function () {
       })
     })
 
-    it('should provide appropriate types for integers', function () {
-      testMethodViewModel.requestType.properties.filter(o => o.name === "id")[0].type.value("8")
-      let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue().id
-      assert(valueFromEffectiveValue === 8)
-      assert(valueFromEffectiveValue !== "8")
+    let indexesOf32Bits = [1,3,5,7,9]
+    indexesOf32Bits.forEach(index => {
+      it('should provide appropriate types for 32-bit integers', function () {
+        testMethodViewModel.requestType.properties.filter(o => o.name === `id${index}`)[0].type.value("8")
+        let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue()[`id${index}`]
+        assert(valueFromEffectiveValue === 8)
+      })
+
+      it('should provide 0 as a conversion for empty for 32-bit integers', function () {
+        testMethodViewModel.requestType.properties.filter(o => o.name === `id${index}`)[0].type.value("")
+        let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue()[`id${index}`]
+        assert(valueFromEffectiveValue === 0)
+      })
     })
 
-    it('should provide 0 as a conversion for empty for integers', function () {
-      testMethodViewModel.requestType.properties.filter(o => o.name === "id")[0].type.value("")
-      let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue().id
-      assert(valueFromEffectiveValue === 0)
+    let indexesOf64Bits = [2,4,6,8,10]
+    indexesOf64Bits.forEach(index => {
+      it('should provide appropriate types for 64-bit integers', function () {
+        testMethodViewModel.requestType.properties.filter(o => o.name === `id${index}`)[0].type.value("888888888888888")
+        let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue()[`id${index}`]
+        assert(valueFromEffectiveValue === "888888888888888")
+      })
+
+      it('should provide \'0\' as a conversion for empty for 64-bit integers', function () {
+        testMethodViewModel.requestType.properties.filter(o => o.name === `id${index}`)[0].type.value("")
+        let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue()[`id${index}`]
+        assert(valueFromEffectiveValue === "0")
+      })
     })
 
     describe("when I get a return type", function () {
