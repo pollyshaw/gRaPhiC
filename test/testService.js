@@ -20,6 +20,14 @@ function getServer() {
       })
     }
   })
+
+  server.addService(grpcServices.test.SecondTestService.service, {
+    noOp: function (call, callback) {
+      console.log(`called NoOp with request ${JSON.stringify(call.request)}`)
+      callback(null, {succcess:{}, but_always_there:{}})
+    }
+  })
+
   return server
 }
 

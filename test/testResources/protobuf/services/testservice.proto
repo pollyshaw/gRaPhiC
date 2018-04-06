@@ -8,10 +8,17 @@ service TestService {
 }
 
 service SecondTestService {
-    rpc NoOp(EmptyMessage) returns (PossiblyFailingMessage){}
+    rpc NoOp(QueryParamMessage) returns (PossiblyFailingMessage){}
 }
 
 message EmptyMessage {}
+
+message QueryParamMessage {
+    oneof predicate {
+        uint32 id = 1;
+        string name = 2;
+    }
+}
 
 message PossiblyFailingMessage {
     oneof result {
