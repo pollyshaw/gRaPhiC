@@ -142,16 +142,33 @@ describe('grpcViewModel', function () {
     describe("when I get a return type with a OneOf", function() {
       let possiblyFailingReturnType = secondTestServiceViewModel.methods[0].responseType
 
-      it('should have 3 children', function () {
-        assert(possiblyFailingReturnType.properties.length === 3)
+      it('should have two children, called \'result\' and \'but_always_there\'', function () {
+        assert.equal(possiblyFailingReturnType.properties.length, 2)
+        assert.equal(possiblyFailingReturnType.properties[0].name, 'result')
+        assert.equal(possiblyFailingReturnType.properties[1].name, 'but_always_there')
       })
 
-      it('should have the first two with a OneOf value', function() {
-        assert.equal(possiblyFailingReturnType.properties[0].oneOf, 'result')
-        assert.equal(possiblyFailingReturnType.properties[1].oneOf,'result')
-        assert(!possiblyFailingReturnType.properties[2].oneOf)
+      describe ("when I get result", function() {
+        let result = possiblyFailingReturnType.properties[0]
+        it('should be a OneOf', function() {
+          assert(result.isOneOf)
+        })
+
+        it('should have two options', function() {
+          assert.equal(result.options[0].name, 'success')
+          assert.equal(result.options[1].name, 'failure')
+        })
+
+        it('should have \'success\' as its selected option', function() {
+          assert.equal(result.selectedOption(), 'success')
+        })
+
+        it('should have \'EmptyMessage\' as its selected option type', function() {
+          assert.equal(result.selectedOptionType().name, "EmptyMessage" )
+        })
 
       })
+
     })
 
   })

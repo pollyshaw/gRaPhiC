@@ -1,18 +1,45 @@
 let ko = require("knockout")
+let assert = require("assert")
 
 let getTypeModel = function (type) {
   let properties = []
   if (type.children) {
+    let oneOfChildren = type.children.filter(c => c.constructor.name === "OneOf")
+    for (let child in oneOfChildren) {
+      properties.push({
+        name: oneOfChildren[child].name,
+        isOneOf: true,
+        options: []
+      })
+    }
     let fieldChildren = type.children.filter(c => c.className === 'Message.Field') 
     for (let child in fieldChildren) {
-      let childField =
-        properties.push({
-          name: fieldChildren[child].name,
-          type: getTypeModel(fieldChildren[child].resolvedType ?
-              fieldChildren[child].resolvedType :
-              fieldChildren[child].type),
-          oneOf: fieldChildren[child].oneof? fieldChildren[child].oneof.name: null
-        })
+      childViewModel = {
+        name: fieldChildren[child].name,
+        type: getTypeModel(fieldChildren[child].resolvedType ?
+            fieldChildren[child].resolvedType :
+            fieldChildren[child].type),
+        isOneOf: false
+      }
+      if (fieldChildren[child].oneof) {
+        parentOneOf = properties.filter(c => c.isOneOf && c.name === fieldChildren[child].oneof.name)[0]
+        assert(parentOneOf, `Child ${childViewModel.name} is in a OneOf but no oneof with name ${fieldChildren[child].oneof.name} found.`)
+        parentOneOf.options.push(childViewModel)
+      } else {
+        properties.push(childViewModel)
+      }
+    }
+    // now that we have all the options for all the oneOfs, we select options.
+    let oneOfProperties = properties.filter(p => p.isOneOf)
+    for (let property in oneOfProperties){
+      oneOfProperties[property].selectedOption =
+          ko.observable(oneOfProperties[property].options[0].name)
+      oneOfProperties[property].selectedOptionType = ko.computed(function(){
+        return this.options
+            .filter(o => o.name === this.selectedOption())[0]
+            .type
+      }, oneOfProperties[property])
+
     }
   }
   let result = {
@@ -35,7 +62,12 @@ let getTypeModel = function (type) {
     } else {
       let acc = {};
       for (let i = 0; i < result.properties.length; i++) {
-        acc[result.properties[i].name] = result.properties[i].type.effectiveValue()
+        if (result.properties[i].isOneOf) {
+          selectedOption = result.properties[i].selectedOption()
+          acc[selectedOption] = result.properties[i].selectedOptionType().effectiveValue()
+        } else {
+          acc[result.properties[i].name] = result.properties[i].type.effectiveValue()
+        }
       }
       return acc
     }
