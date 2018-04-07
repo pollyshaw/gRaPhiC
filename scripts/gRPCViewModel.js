@@ -57,9 +57,10 @@ let getTypeModel = function (type) {
           return parseInt(valueAsString) || 0;
         }
         return 0
-      }
-      else if(['uint64', 'int64', 'sint64', 'fixed64', 'sfixed64'].includes(result.name)) {
+      } else if(['uint64', 'int64', 'sint64', 'fixed64', 'sfixed64'].includes(result.name)) {
         return valueAsString || '0'
+      } else if (result.name === 'bool') {
+        return valueAsString === true
       }
       return valueAsString
     } else {

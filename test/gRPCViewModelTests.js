@@ -82,7 +82,7 @@ describe('grpcViewModel', function () {
 
     let indexesOf32Bits = [1,3,5,7,9]
     indexesOf32Bits.forEach(index => {
-      it('should provide appropriate types for 32-bit integers', function () {
+      it('should provide Numbers for 32-bit integers', function () {
         testMethodViewModel.requestType.properties.filter(o => o.name === `id${index}`)[0].type.value("8")
         let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue()[`id${index}`]
         assert(valueFromEffectiveValue === 8)
@@ -97,7 +97,7 @@ describe('grpcViewModel', function () {
 
     let indexesOf64Bits = [2,4,6,8,10]
     indexesOf64Bits.forEach(index => {
-      it('should provide appropriate types for 64-bit integers', function () {
+      it('should provide strings for 64-bit integers', function () {
         testMethodViewModel.requestType.properties.filter(o => o.name === `id${index}`)[0].type.value("888888888888888")
         let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue()[`id${index}`]
         assert(valueFromEffectiveValue === "888888888888888")
@@ -108,6 +108,18 @@ describe('grpcViewModel', function () {
         let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue()[`id${index}`]
         assert(valueFromEffectiveValue === "0")
       })
+    })
+
+    it('should provide bools for protobuf bools', function () {
+      testMethodViewModel.requestType.properties.filter(o => o.name === `extraBool`)[0].type.value(true)
+      let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue().extraBool
+      assert(valueFromEffectiveValue === true)
+    })
+
+    it('should provide false as default values for protobuf bools', function () {
+      testMethodViewModel.requestType.properties.filter(o => o.name === `extraBool`)[0].type.value(null)
+      let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue().extraBool
+      assert(valueFromEffectiveValue === false)
     })
 
     describe("when I get a return type", function () {

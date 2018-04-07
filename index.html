@@ -10,7 +10,12 @@
     <div>
       <span data-bind="text: name"></span>
       <span data-bind="if: isScalar">
-      <input type="text" data-bind="value:value"/>
+        <span data-bind="if: name === 'bool'">
+          <input type="checkbox" data-bind="checked: value">
+        </span>
+        <span data-bind="if: name !== 'bool'">
+          <input type="text" data-bind="value:value"/>
+        </span>
       </span>
       <div style="padding-left:5px;border-left:5px solid gray" data-bind="foreach: properties">
         <span data-bind="text: name"></span>
