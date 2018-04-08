@@ -50,4 +50,6 @@ message IdMessage {
     sfixed32 id9 = 9;
     sfixed64 id10 = 10;
     bool extraBool = 11;
+    float extraFloat = 12;
+    double extraDouble = 13;
 }

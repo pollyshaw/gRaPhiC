@@ -53,14 +53,13 @@ let getTypeModel = function (type) {
     if (result.isScalar) {
       let valueAsString = result.value();
       if (['uint32', 'int32', 'sint32', 'fixed32', 'sfixed32'].includes(result.name)) {
-        if (valueAsString) {
-          return parseInt(valueAsString) || 0;
-        }
-        return 0
+        return parseInt(valueAsString) || 0;
       } else if(['uint64', 'int64', 'sint64', 'fixed64', 'sfixed64'].includes(result.name)) {
         return valueAsString || '0'
       } else if (result.name === 'bool') {
         return valueAsString === true
+      } else if (['float', 'double'].includes(result.name)) {
+        return parseFloat(valueAsString) || 0.0
       }
       return valueAsString
     } else {

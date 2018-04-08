@@ -122,6 +122,20 @@ describe('grpcViewModel', function () {
       assert(valueFromEffectiveValue === false)
     })
 
+    Array("extraFloat", "extraDouble").forEach(fieldName => {
+      it('should provide Numbers for protobuf floats and doubles', function () {
+        testMethodViewModel.requestType.properties.filter(o => o.name === fieldName)[0].type.value(10000000.56)
+        let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue()[fieldName]
+        assert.equal(valueFromEffectiveValue, 10000000.56)
+      })
+
+      it('should provide 0 as default values for protobuf bools', function () {
+        testMethodViewModel.requestType.properties.filter(o => o.name === fieldName)[0].type.value(null)
+        let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue()[fieldName]
+        assert.equal(valueFromEffectiveValue, 0.0)
+      })
+    })
+
     describe("when I get a return type", function () {
       let returnType = testMethodViewModel.responseType
 
