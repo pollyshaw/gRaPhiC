@@ -60,6 +60,13 @@ let getTypeModel = function (type) {
         return valueAsString === true
       } else if (['float', 'double'].includes(result.name)) {
         return parseFloat(valueAsString) || 0.0
+      } else if (result.name === 'bytes') {
+        if (valueAsString) {
+
+          return Buffer.from(valueAsString.replace(/[^0-9a-fA-F]/g, ''), "hex")
+              .toString('base64')
+        }
+        else return ''
       }
       return valueAsString
     } else {

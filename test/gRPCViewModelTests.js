@@ -136,6 +136,18 @@ describe('grpcViewModel', function () {
       })
     })
 
+    it('should provide base64-encoding of hex strings for bytes', function () {
+      testMethodViewModel.requestType.properties.filter(o => o.name === 'extraBytes')[0].type.value("48 65 6c 6c 6f")
+      let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue().extraBytes
+      assert.equal("SGVsbG8=", valueFromEffectiveValue)
+    })
+
+    it('should provide empty strings as default values for bytes', function () {
+      testMethodViewModel.requestType.properties.filter(o => o.name === `extraBool`)[0].type.value(null)
+      let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue().extraBool
+      assert.equal(valueFromEffectiveValue, "")
+    })
+
     describe("when I get a return type", function () {
       let returnType = testMethodViewModel.responseType
 
