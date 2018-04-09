@@ -52,4 +52,5 @@ message IdMessage {
     bool extraBool = 11;
     float extraFloat = 12;
     double extraDouble = 13;
+    bytes extraBytes = 14;
 }

@@ -3,6 +3,13 @@
 
 <head>
   <meta charset="utf-8">
+   <!--Import Google Icon Font-->
+   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+   <!--Import materialize.css-->
+   <link type="text/css" rel="stylesheet" href="node_modules/materialize-css/dist/css/materialize.min.css"  media="screen,projection"/>
+
+   <!--Let browser know website is optimized for mobile-->
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 
 <body>
@@ -28,11 +35,19 @@
       </div>
   </div>
   </script>
-  <nav class="nav js-nav">
-    <header class="nav-header">
-      <h1 class="nav-title">gRaPhiCview</h1>
-    </header>
-
+  <nav class="nav js-nav" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">gRaPhiCview</a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="#">Navbar Link</a></li>
+      </ul>
+      <ul id="nav-mobile" class="sidenav">
+          <li><a href="#">Navbar Link</a></li>
+        </ul>
+      <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+<div class="row">
+  <div class="col s3" id="navPanel">
     <div>
       <label for="txtProtobufFile">Protobuf file</label>
       <input type="text" id="txtProtobufFile" data-bind="value: grpcFile" />
@@ -49,34 +64,53 @@
       <input id type="button" value="Load" data-bind="click:load" />
     </div>
 
-    <div id="servicesTable" data-bind="foreach: services">
-      <h2 data-bind="text: name">
-
-      </h2>
-      <div data-bind="foreach: methods">
-        <h3 data-bind="text: name + '(' + requestType.name + '): ' + responseType.name"></h3>
-        <h4>Request value</h4>
-        <div data-bind="template: {name:'request-template', data: requestType}">
+    <ul class="collapsible" id="servicesTable" data-bind="foreach: services">
+      <li>
+        <div class="collapsible-header">
+          <i class="material-icons">expand_more</i>
+          <span data-bind="text: name"></span>
         </div>
-        <h5>JSON representation</h5>
-        <div data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></div>
-        <h5>Protobuf representation (hex)</h5>
-        <div data-bind="text: requestType.hexBytes"></div>
-        <input type="button" value="Invoke" data-bind="click: function() { invoke($root.serviceRootUrl(), 
-        grpc.credentials.createInsecure(),
-        {},
-        function (...params) {
-          console.log(`Called service with result ${JSON.stringify(params)}`)          
-        })}" />
-        <h4>Response value</h4>
-        <h5>JSON representation</h5>
-        <div data-bind="text: ko.toJSON($data.responseType.effectiveValue(), null, 2)"></div>
-        <h5>Protobuf representation (hex)</h5>
-        <div data-bind="text: responseType.hexBytes"></div>
+        <div class="collapsible-body"  data-bind="foreach: methods">
+          <span data-bind="text: name + '(' + requestType.name + '): ' + responseType.name,
+          click: function() {openMethod($data)}"></span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="col s5">
+    <div id="requestPanel">
+      <ul class="tabs" id="tabStrip" data-bind="foreach:openMethods">
+          <li class="tab"><a data-bind="attr: {href: '#method' + methodId},
+            text: name"></a></li>
+      </ul>
+      <div data-bind="foreach:openMethods">
+        <div data-bind="attr: {id:'method' + methodId}">
+          <h4>Request value</h4>
+          <div data-bind="template: {name:'request-template', data: requestType}">
+          </div>
+          <h5>JSON representation</h5>
+          <div data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></div>
+          <h5>Protobuf representation (hex)</h5>
+          <div data-bind="text: requestType.hexBytes"></div>
+          <input type="button" value="Invoke" data-bind="click: function() { invoke($root.serviceRootUrl(), 
+          grpc.credentials.createInsecure(),
+          {},
+          function (...params) {
+            console.log(`Called service with result ${JSON.stringify(params)}`)
+          })}" />
+          <h4>Response value</h4>
+          <h5>JSON representation</h5>
+          <div data-bind="text: ko.toJSON($data.responseType.effectiveValue(), null, 2)"></div>
+          <h5>Protobuf representation (hex)</h5>
+          <div data-bind="text: responseType.hexBytes"></div>
+        </div>
       </div>
     </div>
-  </nav>
-  <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>
+  </div>
+</div>
+  <div>
+    <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>
+  </div>
   <script>
     const grpc = require('grpc')
     const ko = require('knockout')
@@ -102,13 +136,15 @@
       grpcRoot: ko.observable(localStorage.getItem("grpcRoot")),
       serviceRootUrl: ko.observable(localStorage.getItem("serviceRootUrl")),
       load: function () {
-        this.services.removeAll();
+        this.services.removeAll()
+        this.openMethods.removeAll()
         let newServiceDefinitions = getServiceDefinitions(this.grpcFile(), this.grpcRoot())
         for (var i = 0; i < newServiceDefinitions.length; i++) {
           this.services.push(newServiceDefinitions[i])
         }
       },
-      services: ko.observableArray()
+      services: ko.observableArray(),
+      openMethods: ko.observableArray()
     }
 
     myViewModel.serviceRootUrl.subscribe(function (newValue) {
@@ -116,6 +152,35 @@
     })
 
     ko.applyBindings(myViewModel)
+  </script>
+  <!--JavaScript at end of body for optimized loading-->
+  <script type="text/javascript" src="node_modules/materialize-css/dist/js/materialize.min.js"></script>
+  <script>
+
+    function setUpCollapsible(parentElement) {
+      let onOpenStart = function(collapsibleElement) {
+        collapsibleElement.getElementsByTagName('i')[0].innerText = "expand_less"
+      }
+
+      let onCloseStart = function(collapsibleElement) {
+        collapsibleElement.getElementsByTagName('i')[0].innerText = "expand_more"
+      }
+
+      var elem = parentElement.querySelector('.collapsible');
+      var instance = M.Collapsible.init(elem, {accordion: false,
+        onOpenStart: onOpenStart,
+        onCloseStart: onCloseStart});
+    }
+
+    setUpCollapsible(document)
+
+    function openMethod(method) {
+      if (myViewModel.openMethods.indexOf(method) == -1) {
+        myViewModel.openMethods.push(method)
+      }
+      let tabs = M.Tabs.init(document.getElementById("tabStrip"), {});
+      tabs.select('method' + method.methodId)
+    }
   </script>
 </body>
 

@@ -36,6 +36,17 @@ describe('grpcViewModel', function () {
     assert(testServiceViewModel.methods[0].name === "NoOp")
   })
 
+  it('should have unique ids for each method', function() {
+    let count = 0
+    let set = new Set()
+    grpcViewModel.getAllServices(grpcServices).forEach(s => s.methods.forEach(m => {
+      count++;
+      set.add(m.methodId)
+    }))
+
+    assert.equal(count, set.size)
+  })
+
   describe("When I get the service", function () {
     let result = grpcViewModel.getAllServices(grpcServices)
     let testServiceViewModel = result.filter(o => o.name === "test.TestService")[0]
@@ -134,6 +145,18 @@ describe('grpcViewModel', function () {
         let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue()[fieldName]
         assert.equal(valueFromEffectiveValue, 0.0)
       })
+    })
+
+    it('should provide base64-encoding of hex strings for bytes', function () {
+      testMethodViewModel.requestType.properties.filter(o => o.name === 'extraBytes')[0].type.value("48 65 6c 6c 6f")
+      let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue().extraBytes
+      assert.equal("SGVsbG8=", valueFromEffectiveValue)
+    })
+
+    it('should provide empty strings as default values for bytes', function () {
+      testMethodViewModel.requestType.properties.filter(o => o.name === `extraBool`)[0].type.value(null)
+      let valueFromEffectiveValue = testMethodViewModel.requestType.effectiveValue().extraBool
+      assert.equal(valueFromEffectiveValue, "")
     })
 
     describe("when I get a return type", function () {

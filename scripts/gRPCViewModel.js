@@ -1,5 +1,6 @@
 let ko = require("knockout")
 let assert = require("assert")
+let nextMethodId = 0
 
 let getTypeModel = function (type) {
   let properties = []
@@ -60,6 +61,13 @@ let getTypeModel = function (type) {
         return valueAsString === true
       } else if (['float', 'double'].includes(result.name)) {
         return parseFloat(valueAsString) || 0.0
+      } else if (result.name === 'bytes') {
+        if (valueAsString) {
+
+          return Buffer.from(valueAsString.replace(/[^0-9a-fA-F]/g, ''), "hex")
+              .toString('base64')
+        }
+        else return ''
       }
       return valueAsString
     } else {
@@ -123,8 +131,8 @@ let getServiceMethods = function (grpcService) {
         let serializer = function (hexString) { return Buffer.from(hexString, 'hex') }
         let deserializer = function (buffer) { return buffer.toString('hex') }
         let result = serviceClient[name](
-          requestType.effectiveValue(), 
-          null, 
+          requestType.effectiveValue(),
+          null,
           null,
           function(err, result) {
             if (!err) {
@@ -132,7 +140,8 @@ let getServiceMethods = function (grpcService) {
             }
             callback(err, result)
           })
-      }
+      },
+      methodId: nextMethodId++
     })
   }
   return result
