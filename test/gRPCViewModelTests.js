@@ -43,7 +43,6 @@ describe('grpcViewModel', function () {
       count++;
       set.add(m.methodId)
     }))
-
     assert.equal(count, set.size)
   })
 

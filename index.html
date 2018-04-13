@@ -15,7 +15,6 @@
 <body>
   <script type="text/html" id="request-template">
     <div>
-      <span data-bind="text: name"></span>
       <span data-bind="if: isScalar">
         <span data-bind="if: name === 'bool'">
           <input type="checkbox" data-bind="checked: value">
@@ -24,8 +23,13 @@
           <input type="text" data-bind="value:value"/>
         </span>
       </span>
-      <div style="padding-left:5px;border-left:5px solid gray" data-bind="foreach: properties">
-        <span data-bind="text: name"></span>
+      <div style="padding-left:5px;border-left:1px dotted gray" data-bind="foreach: properties">
+        <label>
+          <span data-bind="text: name"></span>
+          <span data-bind="ifnot: isOneOf">
+            <span data-bind="text: '(' + type.name + ')'"></span>
+          </span>
+        </label>
         <div data-bind="if: isOneOf">
             <select data-bind="options: options.map(o => o.name),
             value: selectedOption"></select>
@@ -37,13 +41,6 @@
   </script>
   <nav class="nav js-nav" role="navigation">
     <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">gRaPhiCview</a>
-      <ul class="right hide-on-med-and-down">
-        <li><a href="#">Navbar Link</a></li>
-      </ul>
-      <ul id="nav-mobile" class="sidenav">
-          <li><a href="#">Navbar Link</a></li>
-        </ul>
-      <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
     </div>
   </nav>
 <div class="row">
@@ -70,9 +67,25 @@
           <i class="material-icons">expand_more</i>
           <span data-bind="text: name"></span>
         </div>
-        <div class="collapsible-body"  data-bind="foreach: methods">
-          <span data-bind="text: name + '(' + requestType.name + '): ' + responseType.name,
-          click: function() {openMethod($data)}"></span>
+        <div class="collapsible-body">
+          <div data-bind="foreach: methods" style="margin:-2rem -2rem -2rem 0rem">
+              <div style="display: flex;
+              cursor: pointer;
+              -webkit-tap-highlight-color: transparent;
+              line-height: 1.5;
+              padding: 1rem;
+              background-color:#fff;
+              border-bottom: 1px solid #ddd;
+          ">
+                <i class="material-icons" style="width: 2rem;
+                font-size: 1.6rem;
+                display: inline-block;
+                text-align: center;
+                margin-right: 1rem;">play_circle_outline</i>
+                <span data-bind="text: name,
+              click: function() {openMethod($data)}">
+                </span>
+              </div>
         </div>
       </li>
     </ul>
@@ -85,24 +98,32 @@
       </ul>
       <div data-bind="foreach:openMethods">
         <div data-bind="attr: {id:'method' + methodId}">
-          <h4>Request value</h4>
-          <div data-bind="template: {name:'request-template', data: requestType}">
+          <h4 data-bind="text:'Request (' + requestType.name + ')'"></h4>
+          <div class="row s6">
+            <div class="col s8">
+                <div data-bind="template: {name:'request-template', data: requestType}">
+                  </div>
+                <input type="button" value="Invoke" data-bind="click: function() { invoke($root.serviceRootUrl(), 
+                  grpc.credentials.createInsecure(),
+                  {},
+                  function (...params) {
+                    console.log(`Called service with result ${JSON.stringify(params)}`)
+                  })}" />
+            </div>
+            <div class="col s4">
+              <h5>JSON representation</h5>
+              <div data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></div>
+              <h5>Protobuf representation (hex)</h5>
+              <div data-bind="text: requestType.hexBytes"></div>
+            </div>
           </div>
-          <h5>JSON representation</h5>
-          <div data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></div>
-          <h5>Protobuf representation (hex)</h5>
-          <div data-bind="text: requestType.hexBytes"></div>
-          <input type="button" value="Invoke" data-bind="click: function() { invoke($root.serviceRootUrl(), 
-          grpc.credentials.createInsecure(),
-          {},
-          function (...params) {
-            console.log(`Called service with result ${JSON.stringify(params)}`)
-          })}" />
-          <h4>Response value</h4>
-          <h5>JSON representation</h5>
-          <div data-bind="text: ko.toJSON($data.responseType.effectiveValue(), null, 2)"></div>
-          <h5>Protobuf representation (hex)</h5>
-          <div data-bind="text: responseType.hexBytes"></div>
+          <div class="row s6">
+            <h4>Response value</h4>
+            <h5>JSON representation</h5>
+            <div data-bind="text: ko.toJSON($data.responseType.effectiveValue(), null, 2)"></div>
+            <h5>Protobuf representation (hex)</h5>
+            <div data-bind="text: responseType.hexBytes"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -177,6 +198,8 @@
     function openMethod(method) {
       if (myViewModel.openMethods.indexOf(method) == -1) {
         myViewModel.openMethods.push(method)
+        let selects = document.getElementById('method' + method.methodId).querySelector('select');
+        M.FormSelect.init(selects, {});
       }
       let tabs = M.Tabs.init(document.getElementById("tabStrip"), {});
       tabs.select('method' + method.methodId)
