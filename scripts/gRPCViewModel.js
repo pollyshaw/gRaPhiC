@@ -13,7 +13,7 @@ let getTypeModel = function (type) {
         options: []
       })
     }
-    let fieldChildren = type.children.filter(c => c.className === 'Message.Field') 
+    let fieldChildren = type.children.filter(c => c.className === 'Message.Field')
     for (let child in fieldChildren) {
       childViewModel = {
         name: fieldChildren[child].name,

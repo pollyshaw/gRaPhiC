@@ -76,14 +76,13 @@
               padding: 1rem;
               background-color:#fff;
               border-bottom: 1px solid #ddd;
-          ">
+          " data-bind="click: function() {openMethod($data)}">
                 <i class="material-icons" style="width: 2rem;
                 font-size: 1.6rem;
                 display: inline-block;
                 text-align: center;
                 margin-right: 1rem;">play_circle_outline</i>
-                <span data-bind="text: name,
-              click: function() {openMethod($data)}">
+                <span data-bind="text: name">
                 </span>
               </div>
         </div>
@@ -100,7 +99,18 @@
         <div data-bind="attr: {id:'method' + methodId}">
           <h4 data-bind="text:'Request (' + requestType.name + ')'"></h4>
           <div class="row s6">
-            <div class="col s8">
+            <ul class="tabs" data-bind="attr: {id: 'tabStripRequest' + methodId}" >
+              <li class="tab">
+                <a data-bind="attr: {href: '#requestForm' + methodId}">Form</a>
+              </li>
+              <li class="tab">
+                <a data-bind="attr: {href: '#requestJson' + methodId}">JSON</a>
+              </li>
+              <li class="tab">
+                <a data-bind="attr: {href: '#requestProtobuf' + methodId}">Protobuf</a>
+              </li>
+            </ul>
+            <div data-bind="attr: {id: 'requestForm' + methodId}">
                 <div data-bind="template: {name:'request-template', data: requestType}">
                   </div>
                 <input type="button" value="Invoke" data-bind="click: function() { invoke($root.serviceRootUrl(), 
@@ -110,11 +120,11 @@
                     console.log(`Called service with result ${JSON.stringify(params)}`)
                   })}" />
             </div>
-            <div class="col s4">
-              <h5>JSON representation</h5>
-              <div data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></div>
-              <h5>Protobuf representation (hex)</h5>
-              <div data-bind="text: requestType.hexBytes"></div>
+            <div data-bind="attr: {id: 'requestJson' + methodId}">
+              <pre data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></pre>
+            </div>
+            <div data-bind="attr: {id: 'requestProtobuf' + methodId}">
+              <pre data-bind="text: requestType.hexBytes"></pre>
             </div>
           </div>
           <div class="row s6">
@@ -200,6 +210,7 @@
         myViewModel.openMethods.push(method)
         let selects = document.getElementById('method' + method.methodId).querySelector('select');
         M.FormSelect.init(selects, {});
+        M.Tabs.init(document.getElementById("tabStripRequest" + method.methodId), {});
       }
       let tabs = M.Tabs.init(document.getElementById("tabStrip"), {});
       tabs.select('method' + method.methodId)
