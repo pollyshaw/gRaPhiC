@@ -64,7 +64,7 @@
     <ul class="collapsible" id="servicesTable" data-bind="foreach: services">
       <li>
         <div class="collapsible-header">
-          <i class="material-icons">expand_more</i>
+          <i class="material-icons expand-toggle">expand_more</i>
           <span data-bind="text: name"></span>
         </div>
         <div class="collapsible-body">
@@ -97,43 +97,59 @@
       </ul>
       <div data-bind="foreach:openMethods">
         <div data-bind="attr: {id:'method' + methodId}">
-          <h4 data-bind="text:'Request (' + requestType.name + ')'"></h4>
-          <div class="row s6">
-            <ul class="tabs" data-bind="attr: {id: 'tabStripRequest' + methodId}" >
-              <li class="tab">
-                <a data-bind="attr: {href: '#requestForm' + methodId}">Form</a>
-              </li>
-              <li class="tab">
-                <a data-bind="attr: {href: '#requestJson' + methodId}">JSON</a>
-              </li>
-              <li class="tab">
-                <a data-bind="attr: {href: '#requestProtobuf' + methodId}">Protobuf</a>
-              </li>
-            </ul>
-            <div data-bind="attr: {id: 'requestForm' + methodId}">
-                <div data-bind="template: {name:'request-template', data: requestType}">
-                  </div>
-                <input type="button" value="Invoke" data-bind="click: function() { invoke($root.serviceRootUrl(), 
+          <ul class="collapsible">
+            <li class="active">
+              <div style="float:right">
+                <a class="btn-large" data-bind="click: function() { invoke($root.serviceRootUrl(), 
                   grpc.credentials.createInsecure(),
                   {},
                   function (...params) {
                     console.log(`Called service with result ${JSON.stringify(params)}`)
-                  })}" />
-            </div>
-            <div data-bind="attr: {id: 'requestJson' + methodId}">
-              <pre data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></pre>
-            </div>
-            <div data-bind="attr: {id: 'requestProtobuf' + methodId}">
-              <pre data-bind="text: requestType.hexBytes"></pre>
-            </div>
-          </div>
-          <div class="row s6">
-            <h4>Response value</h4>
-            <h5>JSON representation</h5>
-            <div data-bind="text: ko.toJSON($data.responseType.effectiveValue(), null, 2)"></div>
-            <h5>Protobuf representation (hex)</h5>
-            <div data-bind="text: responseType.hexBytes"></div>
-          </div>
+                  })}" >
+                  <i class="large material-icons">play_circle_outline</i>Invoke
+                </a>
+              </div>
+              <div class="collapsible-header">
+                <i class="material-icons expand-toggle">expand_more</i>
+                <span data-bind="text:'Request (' + requestType.name + ')'"></span>
+              </div>
+              <div class="collapsible-body">
+                <ul class="tabs" data-bind="attr: {id: 'tabStripRequest' + methodId}" >
+                  <li class="tab">
+                    <a data-bind="attr: {href: '#requestForm' + methodId}">Form</a>
+                  </li>
+                  <li class="tab">
+                    <a data-bind="attr: {href: '#requestJson' + methodId}">JSON</a>
+                  </li>
+                  <li class="tab">
+                    <a data-bind="attr: {href: '#requestProtobuf' + methodId}">Protobuf</a>
+                  </li>
+                </ul>
+                <div data-bind="attr: {id: 'requestForm' + methodId}">
+                    <div data-bind="template: {name:'request-template', data: requestType}">
+                    </div>
+                </div>
+                <div data-bind="attr: {id: 'requestJson' + methodId}">
+                  <pre data-bind="text: ko.toJSON($data.requestType.effectiveValue(), null, 2)"></pre>
+                </div>
+                <div data-bind="attr: {id: 'requestProtobuf' + methodId}">
+                  <pre data-bind="text: requestType.hexBytes"></pre>
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="collapsible-header">
+                  <i class="material-icons expand-toggle">expand_more</i>
+                  <span data-bind="text:'Response (' + responseType.name + ')'"></span>
+              </div>
+              <div class="collapsible-body">
+                <h5>JSON representation</h5>
+                <div data-bind="text: ko.toJSON($data.responseType.effectiveValue(), null, 2)"></div>
+                <h5>Protobuf representation (hex)</h5>
+                <div data-bind="text: responseType.hexBytes"></div>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -208,6 +224,7 @@
     function openMethod(method) {
       if (myViewModel.openMethods.indexOf(method) == -1) {
         myViewModel.openMethods.push(method)
+        setUpCollapsible(document.getElementById("method" + method.methodId), {})
         let selects = document.getElementById('method' + method.methodId).querySelector('select');
         M.FormSelect.init(selects, {});
         M.Tabs.init(document.getElementById("tabStripRequest" + method.methodId), {});
