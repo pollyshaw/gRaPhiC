@@ -97,21 +97,26 @@
       </ul>
       <div data-bind="foreach:openMethods">
         <div data-bind="attr: {id:'method' + methodId}">
-          <ul class="collapsible">
-            <li class="active">
-              <div style="float:right">
-                <a class="btn-large" data-bind="click: function() { invoke($root.serviceRootUrl(), 
-                  grpc.credentials.createInsecure(),
-                  {},
-                  function (...params) {
-                    console.log(`Called service with result ${JSON.stringify(params)}`)
-                  })}" >
-                  <i class="large material-icons">play_circle_outline</i>Invoke
-                </a>
-              </div>
+          <ul class="collapsible" data-bind="attr: {id:'collapsibleMethod' + methodId}">
+            <li class="active"> 
               <div class="collapsible-header">
-                <i class="material-icons expand-toggle">expand_more</i>
-                <span data-bind="text:'Request (' + requestType.name + ')'"></span>
+                <div style="width:80%">
+                  <i class="material-icons expand-toggle">expand_more</i>
+                  <span data-bind="text:'Request (' + requestType.name + ')'"></span>
+                </div>
+                <div style="width:20%;text-align:right">
+                  <a class="btn-small waves-effect waves light" data-bind="click: function() { invoke($root.serviceRootUrl(),
+                    grpc.credentials.createInsecure(),
+                    {},
+                    function (...params) {
+                      console.log(`Called service with result ${JSON.stringify(params)}`)
+                    })
+                    let collapsibleInstance = M.Collapsible.getInstance(document.getElementById('collapsibleMethod' + $data.methodId));
+                    collapsibleInstance.close(0)
+                    collapsibleInstance.open(1)
+                    event.stopPropagation();
+                  }" title="Invoke"><i class="large material-icons" style="margin: 0rem;" >play_circle_outline</i></a>
+                </div>
               </div>
               <div class="collapsible-body">
                 <ul class="tabs" data-bind="attr: {id: 'tabStripRequest' + methodId}" >
@@ -206,11 +211,13 @@
 
     function setUpCollapsible(parentElement) {
       let onOpenStart = function(collapsibleElement) {
-        collapsibleElement.getElementsByTagName('i')[0].innerText = "expand_less"
+        collapsibleElement.getElementsByClassName('expand-toggle')
+            [0].innerText = "expand_less"
       }
 
       let onCloseStart = function(collapsibleElement) {
-        collapsibleElement.getElementsByTagName('i')[0].innerText = "expand_more"
+        collapsibleElement.getElementsByClassName('expand-toggle')
+            [0].innerText = "expand_more"
       }
 
       var elem = parentElement.querySelector('.collapsible');
