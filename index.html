@@ -121,7 +121,7 @@
               <div class="collapsible-body">
                 <ul class="tabs" data-bind="attr: {id: 'tabStripRequest' + methodId}" >
                   <li class="tab">
-                    <a data-bind="attr: {href: '#requestForm' + methodId}">Form</a>
+                    <a class="active" data-bind="attr: {href: '#requestForm' + methodId}">Form</a>
                   </li>
                   <li class="tab">
                     <a data-bind="attr: {href: '#requestJson' + methodId}">JSON</a>
@@ -148,10 +148,20 @@
                   <span data-bind="text:'Response (' + responseType.name + ')'"></span>
               </div>
               <div class="collapsible-body">
-                <h5>JSON representation</h5>
-                <div data-bind="text: ko.toJSON($data.responseType.effectiveValue(), null, 2)"></div>
-                <h5>Protobuf representation (hex)</h5>
-                <div data-bind="text: responseType.hexBytes"></div>
+                <ul class="tabs" data-bind="attr: {id: 'tabStripResponse' + methodId}" >
+                  <li class="tab">
+                    <a class="active" data-bind="attr: {href: '#responseJson' + methodId}">JSON</a>
+                  </li>
+                  <li class="tab">
+                    <a data-bind="attr: {href: '#responseProtobuf' + methodId}">Protobuf</a>
+                  </li>
+                </ul>
+                <div data-bind="attr: {id: 'responseJson' + methodId}">
+                  <pre data-bind="text: ko.toJSON($data.responseType.effectiveValue(), null, 2)"></pre>
+                </div>
+                <div data-bind="attr: {id: 'responseProtobuf' + methodId}">
+                  <pre data-bind="text: responseType.hexBytes"></pre>
+                </div>
               </div>
             </li>
           </ul>
@@ -235,6 +245,7 @@
         let selects = document.getElementById('method' + method.methodId).querySelector('select');
         M.FormSelect.init(selects, {});
         M.Tabs.init(document.getElementById("tabStripRequest" + method.methodId), {});
+        M.Tabs.init(document.getElementById("tabStripResponse" + method.methodId), {});
       }
       let tabs = M.Tabs.init(document.getElementById("tabStrip"), {});
       tabs.select('method' + method.methodId)
