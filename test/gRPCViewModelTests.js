@@ -66,26 +66,34 @@ describe('grpcViewModel', function () {
     })
 
     describe("when I start the service", function () {
-      testService.startServer()
+      before("start service", function() { testService.startServer() })
+      after("set up timeout to stop service", function() {
+        setTimeout(() =>testService.stopServer(), 1000)
+      })
 
       it('should have an invoke method on each method', function () {
+        let timeout = setTimeout(function() {
+          console.error("gRPC method has not returned after 500ms")
+        }, 500)
+
         let client = testMethodViewModel.invoke(`localhost:${testService.port}`,
           grpc.credentials.createInsecure(),
           {},
           function (...params) {
-            console.log(`Called service with result ${JSON.stringify(params)}`) 
+            methodReturned = true
+            console.log(`Called service with result ${JSON.stringify(params)}`)
             console.log("Value of first name is ", testMethodViewModel
             .responseType
             .properties
             .filter(p => p.name= 'first_name')[0]
             .type.value())
+            clearTimeout(timeout)
             assert(
               testMethodViewModel
               .responseType
               .properties
               .filter(p => p.name= 'first_name')[0]
               .type.value() === 'Brilliana')
-            testService.stopServer()
           })
       })
     })
