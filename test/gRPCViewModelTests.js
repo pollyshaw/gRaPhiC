@@ -83,7 +83,7 @@ describe('grpcViewModel', function () {
             let firstName = testMethodViewModel
             .responseType
             .properties
-            .filter(p => p.name= 'first_name')[0]
+            .filter(p => p.name == 'first_name')[0]
             .type.value()
             console.log(`Called service with result ${JSON.stringify(params)}`)
             console.log("Value of first name is ", firstName)
