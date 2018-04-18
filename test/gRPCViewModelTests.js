@@ -80,20 +80,16 @@ describe('grpcViewModel', function () {
           grpc.credentials.createInsecure(),
           {},
           function (...params) {
-            methodReturned = true
-            console.log(`Called service with result ${JSON.stringify(params)}`)
-            console.log("Value of first name is ", testMethodViewModel
+            let firstName = testMethodViewModel
             .responseType
             .properties
             .filter(p => p.name= 'first_name')[0]
-            .type.value())
+            .type.value()
+            console.log(`Called service with result ${JSON.stringify(params)}`)
+            console.log("Value of first name is ", firstName)
             clearTimeout(timeout)
-            assert(
-              testMethodViewModel
-              .responseType
-              .properties
-              .filter(p => p.name= 'first_name')[0]
-              .type.value() === 'Brilliana')
+            assert.equal('Brilliana', firstName,
+            "Name returned from service unexpected")
           })
       })
     })
@@ -170,8 +166,8 @@ describe('grpcViewModel', function () {
       let returnType = testMethodViewModel.responseType
 
       it('should have properties', function () {
-        assert(returnType.properties.filter(o => o.name === "first_name").length !== 0)
-        assert(returnType.properties.filter(o => o.name === "year_of_birth").length !== 0)
+        assert(returnType.properties.filter(o => o.name === "first_name").length !== 0, "No 'first_name' found in " + JSON.stringify(returnType.properties.map(o=>o.name)))
+        assert(returnType.properties.filter(o => o.name === "year_of_birth").length !== 0, "No 'year_of_birth' found in " + JSON.stringify(returnType.properties.map(o=>o.name)))
       })
 
       describe("when I get a return type's first_name field", function () {
