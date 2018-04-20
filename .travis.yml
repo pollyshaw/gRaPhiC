@@ -1,3 +1,13 @@
 language: node_js
-node_js: "8"
-script: "npm run ci-build"
+node_js: '8'
+script:
+  - npm run ci-build
+  - npm run tar
+deploy:
+  provider: releases
+  api_key:
+    secure: VDzac+xu0SckPwitQZxQe49irClZVNdbNRWa23y81J5mWKOOCf4YUuwu44QxRe1niIq+EkCQqACplwvQMtt8cay9lDHxdOQI7VXwlOf474IhLH9Lde6/7tlt7CDSzBh3RUK1u8bLuXJ9mbRf4le0UzboNSKj2R+m4XPoAnMyKz1s45lzakFAiZa46/4f1KCAa2RaUjivt5lMRfH5IKYoTDFJRM2SJUWqci0RyFUfFW+mMu1locmBZeO01LZ5qNmayf+yETYaQDzq50BN9oog0kyW2VcBJCuoVBxX9MWECgZg9A9DHUPtdRr5jDZePtOF21H3qBC0mwTioSBvStgKJ/PlLg2ZatrWQhKOua25p+ASCEEYtT/JkQq0XD7SGQCMoN7ksGtqt3WSboUghrgz+ZH9bxvRmfqRo7LOhAvxkJNHU90vslIVTS2QfYN81ufIhaSK2OjzQ6gkRsVvqF8vjW2Ln4LeBSXanvVJml6AHuKWqR79XIrkwzhjzEx5KTsEfnXCnEunBq8k1csl3fQw6q8xNyxoLYbBNDBgCKV/wWdYSV5DzyLJAng4sOSMlGRn5YUq8nZwtU8CU4ZDQgw4OWU+6EoBMekEry0/9A5bdtv8sgoDqBdTAcGM/wThh949fi/IJ+5yYCWddUv+3b7eVqJCc1b7GB4Ue51+gy/ZYTs=
+  file: gRaPhiCview.tar
+  on:
+    tags: true
+    repo: pollyshaw/gRaPhiCview

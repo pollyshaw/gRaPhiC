@@ -15,9 +15,9 @@
     "package:sign-exe": "signcode './out/Electron API Demos-win32-ia32/Electron API Demos.exe' --cert ~/electron-api-demos.p12 --prompt --name 'Electron API Demos' --url 'http://electron.atom.io'",
     "package:installer": "node ./script/installer.js",
     "package:sign-installer": "signcode './out/windows-installer/ElectronAPIDemosSetup.exe' --cert ~/electron-api-demos.p12 --prompt --name 'Electron API Demos' --url 'http://electron.atom.io'",
-    "package:mas": "./script/mas.sh",
-    "windows-store": "node ./script/windows-store.js",
-    "release": "node ./script/release.js"
+    "tar": "tar -czf gRaPhiCview.tar out/graphicview-linux-x64/*"
+
+    
   },
   "keywords": [
     "gRPC",
@@ -41,6 +41,7 @@
     "chai": "^4.1.2",
     "devtron": "^1.4.0",
     "electron": "^1.8.4",
+    "electron-installer-dmg": "^0.2.1",
     "electron-packager": "^12.0.1",
     "electron-rebuild": "^1.7.3",
     "mocha": "^5.0.5",
