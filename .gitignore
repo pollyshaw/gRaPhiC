@@ -63,3 +63,6 @@ typings/
 #IDE settings
 .idea/
 .vscode/
+
+#Electron-package output directory
+out
