@@ -23,7 +23,7 @@
     "GUI"
   ],
   "author": "Polly Shaw",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "dependencies": {
     "grpc": "^1.10.1",
     "knockout": "^3.5.0-beta",
@@ -45,6 +45,7 @@
     "electron-packager": "^12.0.1",
     "electron-rebuild": "^1.7.3",
     "mocha": "^5.0.5",
+    "node-git-version": "^0.1.2",
     "npm-run-all": "^4.1.2",
     "yarn": "^1.5.1"
   }
