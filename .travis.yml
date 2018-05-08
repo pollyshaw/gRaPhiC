@@ -2,7 +2,7 @@ language: node_js
 node_js: '8'
 script:
   - npm run ci-build
-  - npm run tar
+  - npm run deb64
 deploy:
   provider: releases
   api_key:
